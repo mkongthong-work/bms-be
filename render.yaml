@@ -1,0 +1,17 @@
+# Render Blueprint — สร้าง service อัตโนมัติเมื่อเชื่อม repo (New > Blueprint)
+services:
+  - type: web
+    name: bms-api
+    runtime: go
+    plan: free
+    region: singapore
+    buildCommand: go build -o bin/api ./cmd/api
+    startCommand: ./bin/api
+    healthCheckPath: /api/v1/healthz
+    envVars:
+      - key: BMS_DATABASE_URL   # วางค่า connection string ของ Neon (มี sslmode=require)
+        sync: false             # sync:false = กรอกเองใน dashboard ไม่เก็บในไฟล์
+      - key: BMS_JWT_SECRET     # สร้างด้วย: openssl rand -base64 48
+        sync: false
+      - key: BMS_CORS_ORIGIN    # เช่น https://admin.yourdomain.com
+        sync: false

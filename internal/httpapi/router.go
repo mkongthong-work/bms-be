@@ -27,7 +27,7 @@ func NewRouter(cfg *config.Config, store *repo.Store) http.Handler {
 	mux.Handle("GET /api/v1/documents/{id}/pdf", sales(http.HandlerFunc(api.DocumentPDF)))
 	mux.Handle("GET /api/v1/reports/sales.xlsx", account(http.HandlerFunc(api.SalesReportXLSX)))
 
-	return securityHeaders(mux)
+	return corsMiddleware(cfg.CORSOrigin, securityHeaders(mux))
 }
 
 // securityHeaders ใส่ header ป้องกันพื้นฐานทุก response

@@ -1,0 +1,23 @@
+name: Nightly DB Backup
+on:
+  schedule:
+    - cron: '0 19 * * *'   # 19:00 UTC = ตี 2 เวลาไทย
+  workflow_dispatch: {}     # กดรันเองได้
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump + encrypt
+        env:
+          DATABASE_URL: ${{ secrets.BMS_DATABASE_URL }}
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}   # สร้างด้วย openssl rand -base64 32 เก็บไว้ที่ปลอดภัย
+        run: |
+          sudo apt-get install -y -qq postgresql-client
+          pg_dump "$DATABASE_URL" | gzip | \
+            openssl enc -aes-256-cbc -pbkdf2 -pass env:PASSPHRASE \
+            -out "bms-$(date +%F).sql.gz.enc"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bms-backup-${{ github.run_id }}
+          path: bms-*.sql.gz.enc
+          retention-days: 90
