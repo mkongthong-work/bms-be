@@ -1,0 +1,9 @@
+# secrets — ห้าม commit เด็ดขาด
+.env
+*.pem
+*.key
+
+# build artifacts
+/bin/
+*.pdf
+*.xlsx
